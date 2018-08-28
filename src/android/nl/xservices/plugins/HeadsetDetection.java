@@ -57,11 +57,11 @@ public class HeadsetDetection extends CordovaPlugin {
                 mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemoved();");
               }
               else if (status == BT_CONNECTED) {
-                Log.d(LOG_TAG, "Headset is disconnected");
-                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemovedBT();");
+                Log.d(LOG_TAG, "BT Headset is connected");
+                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetAddedBT();");
               }
               else if (status == BT_DISCONNECTED) {
-                Log.d(LOG_TAG, "Headset is disconnected");
+                Log.d(LOG_TAG, "BT Headset is disconnected");
                 mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemovedBT();");
               }
                else {
