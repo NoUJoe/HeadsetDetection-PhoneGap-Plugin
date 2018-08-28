@@ -14,7 +14,14 @@ var HeadsetDetection = {
   },
   remoteHeadsetAdded: function() {
     this.actionCallback && this.actionCallback('headsetAdded');
+  },
+  remoteHeadsetRemovedBT: function() {
+    this.actionCallback && this.actionCallback('headsetRemovedBT');
+  },
+  remoteHeadsetAddedBT: function() {
+    this.actionCallback && this.actionCallback('headsetAddedBT');
   }
 };
 
 module.exports = HeadsetDetection;
+
