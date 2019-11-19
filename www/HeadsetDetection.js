@@ -23,5 +23,31 @@ var HeadsetDetection = {
   }
 };
 
+require('cordova/channel').onCordovaReady.subscribe(function() 
+{
+  require('cordova/exec')(win, null, 'HeadsetDetection', 'cordovaReady', []); 
+   
+  function win(message)
+  {
+    if (message == "headsetRemoved")
+    {
+      HeadsetDetection.remoteHeadsetRemoved ();
+    }
+    else if (message == "headsetAdded")
+    {
+      HeadsetDetection.remoteHeadsetAdded ();
+    }
+    else if (message == "headsetAddedBT")
+    {
+      HeadsetDetection.remoteHeadsetAddedBT ();
+    }
+    else if (message == "headsetRemovedBT")
+    {
+      HeadsetDetection.remoteHeadsetRemovedBT ();
+    }
+  } 
+    
+});
+
 module.exports = HeadsetDetection;
 

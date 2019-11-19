@@ -24,14 +24,21 @@ public class HeadsetDetection extends CordovaPlugin {
 
   private static final String ACTION_DETECT = "detect";
   private static final String ACTION_EVENT = "registerRemoteEvents";
+  private static final String ACTION_APP_INIT = "cordovaReady";
   private static final int DEFAULT_STATE = -1;
   private static final int DISCONNECTED = 0;
   private static final int CONNECTED = 1;
   private static final int BT_DISCONNECTED = 2;
   private static final int BT_CONNECTED = 3;
   protected static CordovaWebView mCachedWebView = null;
+  CallbackContext stateChangeCallback;
 
   BroadcastReceiver receiver;
+
+  PluginResult dataResultRemoved;
+  PluginResult dataResultAdded;
+  PluginResult dataResultRemovedBT;
+  PluginResult dataResultAddedBT;
 
   public HeadsetDetection() {
       this.receiver = null;
@@ -51,18 +58,22 @@ public class HeadsetDetection extends CordovaPlugin {
 
               if (status == CONNECTED) {
                 Log.d(LOG_TAG, "Headset is connected");
-                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetAdded();");
+                //mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetAdded();");
+                stateChangeCallback.sendPluginResult(dataResultAdded);
               } else if (status == DISCONNECTED) {
                 Log.d(LOG_TAG, "Headset is disconnected");
-                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemoved();");
+                //mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemoved();");
+                stateChangeCallback.sendPluginResult(dataResultRemoved);
               }
               else if (status == BT_CONNECTED) {
                 Log.d(LOG_TAG, "BT Headset is connected");
-                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetAddedBT();");
+                //mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetAddedBT();");
+                stateChangeCallback.sendPluginResult(dataResultAddedBT);
               }
               else if (status == BT_DISCONNECTED) {
                 Log.d(LOG_TAG, "BT Headset is disconnected");
-                mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemovedBT();");
+                //mCachedWebView.sendJavascript("cordova.require('cordova-plugin-headsetdetection.HeadsetDetection').remoteHeadsetRemovedBT();");
+                stateChangeCallback.sendPluginResult(dataResultRemovedBT);
               }
                else {
                 Log.d(LOG_TAG, "Headset state is unknown: " + status);
@@ -71,12 +82,30 @@ public class HeadsetDetection extends CordovaPlugin {
       };
       mCachedWebView.getContext().registerReceiver(this.receiver, intentFilter);
   }
+  
 
   @Override
   public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
     try {
-      if (ACTION_DETECT.equals(action) || ACTION_EVENT.equals(action)) {
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isHeadsetEnabled()));
+      if (ACTION_DETECT.equals(action) || ACTION_EVENT.equals(action) || ACTION_APP_INIT.equals (action)) {
+        if (ACTION_APP_INIT.equals (action))
+        {
+           stateChangeCallback = callbackContext;
+
+           dataResultRemoved = new PluginResult(PluginResult.Status.OK, "headsetRemoved");
+           dataResultRemoved.setKeepCallback(true);
+           dataResultAdded = new PluginResult(PluginResult.Status.OK, "headsetAdded");
+           dataResultAdded.setKeepCallback(true);
+           dataResultRemovedBT = new PluginResult(PluginResult.Status.OK, "headsetRemovedBT");
+           dataResultRemovedBT.setKeepCallback(true);
+           dataResultAddedBT = new PluginResult(PluginResult.Status.OK, "headsetAddedBT");
+           dataResultAddedBT.setKeepCallback(true);
+        }
+        else
+        {
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isHeadsetEnabled()));
+        }
+        
         return true;
       } else {
         callbackContext.error("headsetdetection." + action + " is not a supported function. Did you mean '" + ACTION_DETECT + "'?");
